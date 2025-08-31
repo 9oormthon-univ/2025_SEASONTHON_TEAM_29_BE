@@ -83,7 +83,10 @@ public class SecurityConfig {
                             "/swagger-ui/**",
                             "/swagger-ui.html",
                             "/actuator/health",
-                            "/actuator/info"
+                            "/actuator/info",
+                            "/api/oauth2/authorization/google",
+                            "/api/oauth2/authorization/naver",
+                            "/login/oauth2/code/**"
                         ).permitAll()   // Swagger, Spring Actuator 허가
                         .requestMatchers(
                                 "/api/v1/member/**"
@@ -92,7 +95,8 @@ public class SecurityConfig {
                 )   // OAuth2 도입 시 추가
             .oauth2Login(
                 oauth2Login -> oauth2Login
-                    .defaultSuccessUrl("/")
+                    .authorizationEndpoint(authorization -> 
+                        authorization.baseUri("/api/oauth2/authorization"))
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureHandler(oAuth2AuthenticationFailureHandler)
                     .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
