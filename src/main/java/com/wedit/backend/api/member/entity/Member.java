@@ -3,6 +3,7 @@ package com.wedit.backend.api.member.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.wedit.backend.api.invitation.entity.Invitation;
 import com.wedit.backend.api.member.jwt.entity.RefreshToken;
@@ -147,8 +148,16 @@ public class Member extends BaseTimeEntity {
 		return this;
 	}
 
-	// 🎯 커플 정보 편의 메서드
-	public Couple getCouple() {
-		return asGroom != null ? asGroom : asBride;
+	// 현재 사용자가 커플인지 확인하는 메서드
+	public Optional<Couple> getCouple() {
+		if (asGroom != null) {
+            return Optional.of(asGroom);
+        }
+        return Optional.ofNullable(asBride);
 	}
+
+    // 현재 사용자의 파트너를 반환하는 메서드
+    public Optional<Member> getPartner() {
+        return getCouple().map(couple -> couple.getPartner(this));
+    }
 }

@@ -1,7 +1,12 @@
 package com.wedit.backend.api.member.service;
 
+import java.util.Map;
 import java.util.Optional;
 
+import com.wedit.backend.api.notification.dto.NotificationEvent;
+import com.wedit.backend.api.notification.entity.NotificationType;
+import com.wedit.backend.api.notification.entity.TargetDomainType;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,7 @@ public class CoupleService {
 
 	private final CoupleRepository coupleRepository;
 	private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher publisher;
 
 	public String generateOrGetCoupleCode(Long memberId) {
 		log.info("커플 코드 생성/조회 요청 시작. memberId: {}", memberId);
@@ -75,11 +81,34 @@ public class CoupleService {
 				return new BadRequestException(ErrorStatus.BAD_REQUEST_INVALID_COUPLE_CODE.getMessage());
 			});
 
+        Member originalPartner = (couple.getGroom() != null) ? couple.getGroom() : couple.getBride();
+
 		try {
 			couple.connectPartner(newPartner);
 			log.info("커플 연동 성공. memberId: {}, partnerId: {}, coupleId: {}",
-				couple.getGroom() != null ? couple.getGroom().getId() : couple.getBride().getId(),
-				newPartner.getId(), couple.getId());
+                    originalPartner.getId(), newPartner.getId(), couple.getId());
+
+            Map<String, String> argsForOriginal = Map.of("partnerName", newPartner.getName());
+            NotificationEvent eventForOriginal = new NotificationEvent(
+                    originalPartner,
+                    NotificationType.COUPLE_CONNECTION_COMPLETED,
+                    argsForOriginal,
+                    TargetDomainType.MY_PAGE,
+                    originalPartner.getId()
+            );
+            publisher.publishEvent(eventForOriginal);
+            log.info("커플 연동 완료 알림 발행 (기존 배우자에게). memberId: {}", originalPartner.getId());
+
+            Map<String, String> argsForNew = Map.of("partnerName", originalPartner.getName());
+            NotificationEvent eventForNew = new NotificationEvent(
+                    newPartner,
+                    NotificationType.COUPLE_CONNECTION_COMPLETED,
+                    argsForNew,
+                    TargetDomainType.MY_PAGE,
+                    newPartner.getId()
+            );
+            publisher.publishEvent(eventForNew);
+            log.info("커플 연동 완료 알림 발행 (새 배우자에게). memberId: {}", newPartner.getId());
 
 		} catch (BadRequestException e) {
 			log.error("커플 연동 중 비즈니스 로직 오류 발생. memberId: {}, code: {}. 에러 메시지: {}", memberId, coupleCode,

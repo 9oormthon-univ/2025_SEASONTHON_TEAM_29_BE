@@ -47,16 +47,16 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     // 필터링 제외 목록
     public static final String[] NOT_FILTER_URLS = {
-//            "/api/swagger-resources/**",
-//            "/api/swagger-ui/**",
-//            "/api/swagger-ui.html",
-//            "/api/v3/api-docs/**",
-//            "/v3/api-docs/**",
-//            "/swagger-resources/**",
-//            "/swagger-ui/**",
-//            "/swagger-ui.html",
-//            "/api/webjars/**",
-//            "/webjars/**"
+            "/api/swagger-resources/**",
+            "/api/swagger-ui/**",
+            "/api/swagger-ui.html",
+            "/api/v3/api-docs/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/api/webjars/**",
+            "/webjars/**"
     };
 
     /// 엔드포인트 필터링 제외
@@ -64,7 +64,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String requestURI = request.getRequestURI();
 
-        log.info("JwtFilter shouldNotFilter 프로세싱 요청: {}", requestURI);
+//        log.info("JwtFilter shouldNotFilter 프로세싱 요청: {}", requestURI);
 
         for (String url : NOT_FILTER_URLS) {
             if (requestURI.startsWith(url)) {

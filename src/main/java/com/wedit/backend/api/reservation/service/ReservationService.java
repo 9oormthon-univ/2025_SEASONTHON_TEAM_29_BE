@@ -3,6 +3,9 @@ package com.wedit.backend.api.reservation.service;
 
 import com.wedit.backend.api.member.entity.Member;
 import com.wedit.backend.api.member.repository.MemberRepository;
+import com.wedit.backend.api.notification.dto.NotificationEvent;
+import com.wedit.backend.api.notification.entity.NotificationType;
+import com.wedit.backend.api.notification.entity.TargetDomainType;
 import com.wedit.backend.api.reservation.dto.*;
 import com.wedit.backend.api.reservation.entity.ConsultationSlot;
 import com.wedit.backend.api.reservation.entity.Reservation;
@@ -93,7 +96,15 @@ public class ReservationService {
         ReservationEventPayload payload = ReservationEventPayload.from(reservation);
         eventPublisher.publishEvent(new ReservationCreatedEvent(this, payload));
 
-        // 추후 커플 캘린더 구현 시, 캘린더 일정 생성 이벤트 발행
+        Map<String, String> arguments = Map.of("vendorName", reservation.getVendor().getName());
+        NotificationEvent notificationEvent = new NotificationEvent(
+                member,
+                NotificationType.RESERVATION_CONFIRMED,
+                arguments,
+                TargetDomainType.RESERVATION,
+                reservation.getId()
+        );
+        eventPublisher.publishEvent(notificationEvent);
 
         log.info("상담 예약 생성 완료 및 이벤트 발행. reservationId: {}, memberId: {}", reservation.getId(), memberId);
 
@@ -124,7 +135,15 @@ public class ReservationService {
         ReservationEventPayload payload = ReservationEventPayload.from(reservation);
         eventPublisher.publishEvent(new ReservationCancelledEvent(this, payload));
 
-        // 추후 커플 캘린더 구현 시, 커플 캘린더 일정 취소 이벤트 발행
+        Map<String, String> arguments = Map.of("vendorName", reservation.getVendor().getName());
+        NotificationEvent notificationEvent = new NotificationEvent(
+                reservation.getMember(),
+                NotificationType.RESERVATION_CANCELLED,
+                arguments,
+                TargetDomainType.RESERVATION,
+                reservation.getId()
+        );
+        eventPublisher.publishEvent(notificationEvent);
         
         log.info("상담 예약 취소 완료 및 이벤트 발행. reservationId: {}, memberId: {}",  reservationId, memberId);
     }

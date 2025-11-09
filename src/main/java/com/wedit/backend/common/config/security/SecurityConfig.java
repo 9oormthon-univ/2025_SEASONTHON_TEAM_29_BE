@@ -74,23 +74,23 @@ public class SecurityConfig {
                 sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-//                                "/api/swagger-resources/**",
-//                                "/api/swagger-ui/**",
-//                                "/api/swagger-ui.html",
-//                                "/api/v3/api-docs/**",
-//                                "/v3/api-docs/**",
-//                                "/swagger-resources/**",
-//                                "/swagger-ui/**",
-//                                "/swagger-ui.html",
+                                "/api/swagger-resources/**",
+                                "/api/swagger-ui/**",
+                                "/api/swagger-ui.html",
+                                "/api/v3/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/actuator/health",
                                 "/actuator/info",
                                 "/actuator/prometheus",
-//                                "/api/webjars/**",
-//                                "/webjars/**",
+                                "/api/webjars/**",
+                                "/webjars/**",
                                 "/uploads/**",
                                 "/api/oauth2/authorization/**",
                                 "/login/oauth2/code/**",
-                                // "/api/login/oauth2/code/**",
+                                "/api/login/oauth2/code/**",
                                 "/oauth/callback"
                         ).permitAll()   // Swagger, Spring Actuator, OAuth2 Debug 허가
                         .requestMatchers(

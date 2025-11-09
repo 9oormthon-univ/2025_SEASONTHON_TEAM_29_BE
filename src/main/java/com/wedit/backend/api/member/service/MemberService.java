@@ -3,6 +3,9 @@ package com.wedit.backend.api.member.service;
 import java.util.Map;
 
 import com.wedit.backend.api.member.dto.*;
+import com.wedit.backend.api.member.entity.MemberDevice;
+import com.wedit.backend.api.member.repository.MemberDeviceRepository;
+import com.wedit.backend.common.exception.ConflictException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,7 @@ public class MemberService {
 	private final JwtService jwtService;
 	private final PasswordEncoder passwordEncoder;
 	private final PhoneNumberVerificationRepository phoneNumberVerificationRepository;
+    private final MemberDeviceRepository memberDeviceRepository;
 
 	public void signupMember(MemberSignupRequestDTO dto) {
 
@@ -133,4 +137,27 @@ public class MemberService {
 
 		return MemberMyInfoResponseDTO.from(member);
 	}
+
+    public void registerOrUpdateDeviceToken(Member member, MemberDeviceRequestDTO requestDTO) {
+        String fcmToken = requestDTO.getFcmToken();
+
+        memberDeviceRepository.findByFcmToken(fcmToken).ifPresentOrElse(
+                existingDevice -> {
+                    if (!existingDevice.getMember().getId().equals(member.getId())) {
+                        log.warn("다른 사용자의 FCM 토큰으로 등록 시도. 요청자: {}, 기존 소유자: {}, 토큰: {}",
+                                member.getId(), existingDevice.getMember().getId(), fcmToken);
+                        throw new ConflictException(ErrorStatus.CONFLICT_MEMBER_DEVICE_FCM_TOKEN.getMessage());
+                    }
+                    log.info("이미 등록된 FCM 토큰 재확인. 사용자ID: {}", member.getId());
+                },
+                () -> {
+                    MemberDevice newDevice = MemberDevice.builder()
+                            .member(member)
+                            .fcmToken(fcmToken)
+                            .build();
+                    memberDeviceRepository.save(newDevice);
+                    log.info("새로운 FCM 디바이스 토큰 등록 완료. 사용자ID: {}, 토큰: {}", member.getId(), fcmToken);
+                }
+        );
+    }
 }

@@ -42,8 +42,13 @@ jobs:
       - name: Create application.yml
         run: |
           mkdir -p src/main/resources
+          
           echo "application.yml 생성 시작..."
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+          
+          echo "Firebase Key 생성 시작..."
+          echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > src/main/resources/wedit-18c49-firebase-adminsdk-fbsvc-ecf8cc15e4.json
+          
           find src
 
       #          echo "${{ secrets.APPLICATION_JWT_YML }}" > src/main/resources/application-jwt.yml

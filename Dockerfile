@@ -1,5 +1,5 @@
-# OpneJDK 21 사용
-FROM openjdk:21
+# JDK 21 사용
+FROM eclipse-temurin:21-jdk-jammy
 
 # 이미지 메타데이터 정의 (유지관리자, 설명, 버전)
 LABEL maintainer="kim hyun bin" \

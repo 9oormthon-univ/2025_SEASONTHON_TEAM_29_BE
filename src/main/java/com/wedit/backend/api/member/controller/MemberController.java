@@ -6,15 +6,18 @@ import com.wedit.backend.api.member.jwt.entity.RefreshToken;
 import com.wedit.backend.api.member.jwt.service.JwtService;
 import com.wedit.backend.api.member.jwt.service.RefreshTokenService;
 import com.wedit.backend.api.member.service.MemberService;
+import com.wedit.backend.common.config.security.entity.SecurityMember;
 import com.wedit.backend.common.exception.UnauthorizedException;
 import com.wedit.backend.common.response.ApiResponse;
 import com.wedit.backend.common.response.ErrorStatus;
 import com.wedit.backend.common.response.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -153,5 +156,27 @@ public class MemberController {
         MemberMyInfoResponseDTO response = memberService.getMemberInfo(memberId);
 
         return ApiResponse.success(SuccessStatus.MEMBER_MYPAGE_GET_SUCCESS, response);
+    }
+
+    @Operation(
+            summary = "FCM 디바이스 토큰 등록/업데이트",
+            description = "클라이언트(앱)의 FCM 디바이스 토큰을 서버에 등록합니다. <br>" +
+                    "로그인 성공 후, 클라이언트가 FCM 토큰을 발급받으면 반드시 호출해야 합니다.",
+            security = @SecurityRequirement(name = "Authorization")
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토큰 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "FCM 토큰 값이 비어있음", content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패", content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 다른 사용자가 등록한 토큰", content = @Content)
+    })
+    @PostMapping("/device")
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(
+            @Parameter(hidden = true) @AuthenticationPrincipal SecurityMember securityMember,
+            @RequestBody @Valid MemberDeviceRequestDTO requestDTO
+    ) {
+        memberService.registerOrUpdateDeviceToken(securityMember.getMember(), requestDTO);
+
+        return ApiResponse.successOnly(SuccessStatus.MEMBER_DEVICE_FCM_TOKEN_REGISTER_SUCCESS);
     }
 }

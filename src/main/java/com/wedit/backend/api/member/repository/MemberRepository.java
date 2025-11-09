@@ -1,7 +1,10 @@
 package com.wedit.backend.api.member.repository;
 
 import com.wedit.backend.api.member.entity.Member;
+import com.wedit.backend.api.member.entity.Role;
 import com.wedit.backend.api.member.entity.Type;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +35,9 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     // 특정 상태의 회원 조회
     Optional<Member> findByIdAndType(Long id, Type status);
+
+    // 권한에 따른 전체 사용자 조회
+    Page<Member> findByRole(Role role, Pageable pageable);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.asGroom g " +  // 내가 신랑인 Couple 정보

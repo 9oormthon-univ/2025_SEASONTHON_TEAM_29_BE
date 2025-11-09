@@ -126,7 +126,7 @@ public class VendorService {
 	@Transactional(readOnly = true)
 	public Page<VendorBannerResponseDTO> getVendorsForBanner(VendorType vendorType, Pageable pageable) {
 
-		LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
+		LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(12);
 
 		Page<Vendor> vendorPage = vendorRepository.findByVendorTypeOrderByRecentReviews(vendorType, twoWeeksAgo,
 			pageable);
@@ -391,15 +391,19 @@ public class VendorService {
 	}
 
 	private ProductResponseDTO convertToProductResponseDTO(Vendor vendor, Long minPrice) {
-		return ProductResponseDTO.builder()
-			.basePrice(minPrice)
-			.vendorId(vendor.getId())
-			.vendorName(vendor.getName())
-			.averageRating(vendor.getAverageRating())
-			.reviewCount(vendor.getReviewCount())
-			.logoMediaUrl(vendor.getLogoMedia() != null ?
-				s3Service.toCdnUrl(vendor.getLogoMedia().getMediaKey()) : null)
-			.build();
+        return ProductResponseDTO.builder()
+                .basePrice(minPrice)
+                .vendorId(vendor.getId())
+                .vendorName(vendor.getName())
+                .averageRating(vendor.getAverageRating())
+                .reviewCount(vendor.getReviewCount())
+                .logoMediaUrl(vendor.getLogoMedia() != null ?
+                        s3Service.toCdnUrl(vendor.getLogoMedia().getMediaKey()) : null)
+                .fullAddress(vendor.getFullAddress())
+                .addressDetail(vendor.getAddressDetail())
+                .latitude(vendor.getLatitude())
+                .longitude(vendor.getLongitude())
+                .build();
 	}
 
 	@Transactional(readOnly = true)

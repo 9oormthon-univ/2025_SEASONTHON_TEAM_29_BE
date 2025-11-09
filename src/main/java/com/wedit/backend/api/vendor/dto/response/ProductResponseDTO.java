@@ -16,4 +16,8 @@ public class ProductResponseDTO {
 	private Double averageRating;
 	private Integer reviewCount;
 	private String logoMediaUrl;
+    private String fullAddress;
+    private String addressDetail;
+    private Double latitude;
+    private Double longitude;
 }

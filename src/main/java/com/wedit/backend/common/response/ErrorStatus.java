@@ -79,6 +79,7 @@ public enum ErrorStatus {
 
 	/// 409 CONFLICT
 	CONFLICT_DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "중복된 리소스가 존재합니다."),
+    CONFLICT_MEMBER_DEVICE_FCM_TOKEN(HttpStatus.CONFLICT, "이미 다른 사용자가 등록한 FCM 토큰입니다."),
 
 	/// 415 UNSUPPORTED MEDIA TYPE
 	UNSUPPORTED_MEDIA_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 Content-Type 입니다."),
